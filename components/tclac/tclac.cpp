@@ -686,8 +686,9 @@ void tclacClimate::try_send_frame_(uint8_t attempt, uint8_t defers_left) {
 
 // Преобразование байта в читабельный формат
 std::string tclacClimate::getHex(uint8_t *message, uint8_t size) {
-  char buffer[3];
-  std::string result = "";
+  char buffer[3];  // 2 символа + '\0'
+  std::string result;
+  result.reserve(size * 2);  // Оптимизация: резервируем память
   for (int i = 0; i < size; i++) {
     snprintf(buffer, sizeof(buffer), "%02X", message[i]);
     result += buffer;
