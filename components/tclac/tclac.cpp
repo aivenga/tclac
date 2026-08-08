@@ -7,6 +7,7 @@
 #include "esphome.h"
 #include "esphome/core/defines.h"
 #include "tclac.h"
+#include <cmath>
 
 namespace esphome{
 namespace tclac{
@@ -327,7 +328,7 @@ void tclacClimate::takeControl() {
 	
 	// Защита от мусора в байте уставки: до первого статусного кадра
 	// target_temperature = NaN, а (int)NaN — неопределённое поведение.
-	if (isnan(target_temperature) || target_temperature < 16 || target_temperature > 31) {
+	if (std::isnan(target_temperature) || target_temperature < 16 || target_temperature > 31) {
 		target_temperature = 24;
 	}
 	uint8_t target_temperature_set = 31-(int)target_temperature;
@@ -684,13 +685,14 @@ void tclacClimate::try_send_frame_(uint8_t attempt, uint8_t defers_left) {
 }
 
 // Преобразование байта в читабельный формат
-String tclacClimate::getHex(uint8_t *message, uint8_t size) {
-	String raw;
-	for (int i = 0; i < size; i++) {
-		raw += "\n" + String(message[i]);
-	}
-	raw.toUpperCase();
-	return raw;
+std::string tclacClimate::getHex(uint8_t *message, uint8_t size) {
+  char buffer[3];
+  std::string result = "";
+  for (int i = 0; i < size; i++) {
+    snprintf(buffer, sizeof(buffer), "%02X", message[i]);
+    result += buffer;
+  }
+  return result;
 }
 
 // Вычисление контрольной суммы
